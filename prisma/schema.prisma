@@ -1,0 +1,326 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Gender {
+  male
+  female
+  other
+}
+
+// enum for Role
+enum Role {
+  admin
+  employee
+}
+
+enum NotificationType {
+  MESSAGE
+  ALERT
+  REMINDER
+  OTHER
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 Int                  @id @default(autoincrement())
+  name               String
+  email              String               @unique
+  password           String
+  isVerified         Boolean              @default(false)
+  verificationCode   Int
+  isOtpVerified      Boolean              @default(false)
+  isBlocked          Boolean              @default(false)
+  role               Role                 @default(employee)
+  notifications      Notification[] // Notifications for the user
+  profile            Profile?
+  CommunityMember    CommunityMember[]
+  Message            Message[]
+  UserChat           UserChat[]
+  Community          Community[]
+  SocialMediaAccount SocialMediaAccount[]
+  accounts           Account[] // Relation to Account model for social media logins
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+}
+
+model Account {
+  id           Int      @id @default(autoincrement())
+  provider     String
+  userId       Int
+  idToken      String
+  accessToken  String
+  refreshToken String
+  isVerified   Boolean  @default(false)
+  issuedAt     DateTime @default(now())
+  expiresAt    DateTime
+  user         User     @relation(fields: [userId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// --------------------- Profile ---------------------
+model Profile {
+  id     Int     @id @default(autoincrement())
+  userId Int     @unique
+  user   User    @relation(fields: [userId], references: [id])
+  gender String?
+  email  String?
+  image  String?
+
+  // Present contact details
+  presentCountry      String?
+  presentState        String?
+  presentCity         String?
+  presentAddressLine2 String?
+  presentAddressLine3 String?
+  presentPhone        String?
+  presentPostalCode   Int?
+
+  // Permanent contact details
+  permanentCountry      String?
+  permanentState        String?
+  permanentCity         String?
+  permanentPhone        String?
+  permanentAddressLine1 String?
+  permanentAddressLine2 String?
+  permanentAddressLine3 String?
+  permanentPostalCode   Int?
+
+  experiences Experience[]
+
+  references Reference[]
+
+  // Education and skills
+  educationTitle       String?
+  educationDecline     String?
+  educationInstitution String?
+  educationCountry     String?
+  educationState       String?
+  educationCity        String?
+  educationPassingYear Int?
+  educationAttachment  String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
+model Experience {
+  id                       Int       @id @default(autoincrement())
+  profileId                Int
+  profile                  Profile   @relation(fields: [profileId], references: [id])
+  jobTitle                 String?
+  industry                 String?
+  department               String?
+  companyName              String?
+  companyAddress           String?
+  companyContactDiaCode    String?
+  companyContactFullNumber String?
+  startDate                DateTime?
+  endDate                  DateTime?
+  reasonForLeaving         String?
+  certificate              String?
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+}
+
+model Reference {
+  id           Int      @id @default(autoincrement())
+  profileId    Int
+  profile      Profile  @relation(fields: [profileId], references: [id])
+  name         String?
+  relationship String?
+  organization String?
+  mobile       String?
+  address      String?
+  email        String?  @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model SocialMediaAccount {
+  id        Int      @id @default(autoincrement())
+  usrId     Int
+  icon      String
+  title     String
+  email     String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User?    @relation(fields: [userId], references: [id])
+  userId    Int?
+}
+
+// --------------------- Subscription ---------------------
+model Subscription {
+  id                Int                @id @default(autoincrement())
+  duration          Int
+  title             String
+  price             Float
+  description       String
+  features          Int[]
+  userSubscriptions UserSubscription[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+}
+
+model Feature {
+  id          Int      @id @default(autoincrement())
+  title       String   @unique
+  description String
+  amount      Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Payment {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  subscriptionId  Int
+  stripeSessionId String   @unique
+  amount          Float
+  status          String   @default("success")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model UserSubscription {
+  id             Int          @id @default(autoincrement())
+  userId         Int
+  subscriptionId Int
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+  purchaseDate   DateTime     @default(now())
+  expiryDate     DateTime?
+  status         String       @default("active")
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+// ------------- communities, chat and messages -------------
+model Community {
+  id          Int               @id @default(autoincrement())
+  title       String
+  description String
+  image       String
+  members     CommunityMember[] // Many-to-many relationship
+  messages    Message[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  User        User?             @relation(fields: [userId], references: [id])
+  userId      Int?
+}
+
+model CommunityMember {
+  id          Int       @id @default(autoincrement())
+  communityId Int
+  community   Community @relation(fields: [communityId], references: [id])
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id])
+  joinedAt    DateTime  @default(now())
+}
+
+model Message {
+  id          Int        @id @default(autoincrement())
+  communityId Int?
+  community   Community? @relation(fields: [communityId], references: [id]) // Optional for community messages
+  senderId    Int
+  chatId      Int?
+  chat        Chat?      @relation(fields: [chatId], references: [id]) // Optional for private chat messages
+  content     String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  User        User?      @relation(fields: [userId], references: [id])
+  userId      Int?
+}
+
+model Notification {
+  id          Int              @id @default(autoincrement())
+  userId      Int
+  user        User             @relation(fields: [userId], references: [id])
+  title       String
+  description String
+  type        NotificationType
+  read        Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model Chat {
+  id           Int        @id @default(autoincrement())
+  participants UserChat[] // Many-to-many relationship for participants
+  messages     Message[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model UserChat {
+  id     Int  @id @default(autoincrement())
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+  chatId Int
+  chat   Chat @relation(fields: [chatId], references: [id])
+}
+
+// ------------------------- Read and learn how to get  job  -------------------------
+// here admin only upload the video and in mobile app the developer dislay the video, title and thumbnail of the video
+model ReadAndLearn {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  videoUrl    String
+  thumbnail   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// add company data from only using linkedin url
+model Company {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String
+  logo        String
+  website     String
+  linkedinUrl String
+  interviews  Interview[]
+  jobs        Job[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+// scadulae interview for the user, with the company, one user can have multiple  interveiw with multiple company
+model Interview {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  companyId  Int
+  company    Company  @relation(fields: [companyId], references: [id])
+  date       DateTime
+  time       String
+  location   String
+  meetingUrl String
+  isPending  Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// ------------------------- Job -------------------------
+model Job {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  salary      Float
+  location    String
+  company     Company  @relation(fields: [companyId], references: [id])
+  companyId   Int
+  type        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

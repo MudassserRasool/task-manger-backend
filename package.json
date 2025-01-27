@@ -1,0 +1,54 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.mjs",
+  "type": "module",
+  "engines": {
+    "node": ">=18 <22"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.mjs",
+    "debug": "node --inspect src/index.mjs",
+    "dev": "concurrently \"node --watch --no-warnings src/index.mjs\" "
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4",
+    "@prisma/client": "^6.2.1",
+    "bcryptjs": "^2.4.3",
+    "chalk": "^5.4.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "firebase-admin": "^13.0.2",
+    "fs": "^0.0.1-security",
+    "react-icons": "^5.2.1",
+    "glob": "^11.0.0",
+    "heapdump": "^0.3.15",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.3",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.16",
+    "pg": "^8.13.1",
+    "pm2": "^5.4.3",
+    "socket.io": "^4.8.1",
+    "stripe": "^17.5.0",
+    "swagger-autogen": "^2.23.7",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "twilio": "^5.4.0",
+    "uuid": "^11.0.3",
+    "validator": "^13.12.0",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "only-allow": "^1.2.1"
+  }
+}
