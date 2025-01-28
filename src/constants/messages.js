@@ -33,6 +33,13 @@ const messages = {
   GET_SINGLE_SUBSCRIPTION: 'Subscription fetched successfully',
   SUBSCRIPTION_UPDATED: 'Subscription updated successfully',
   SUBSCRIPTION_DELETED: 'Subscription deleted successfully',
+
+  //  ----------------------------------  Task  --------------------------------
+  TASK_CREATED: 'Task created successfully',
+  GET_ALL_TASKS: 'All tasks fetched successfully',
+  GET_SINGLE_TASK: 'Task fetched successfully',
+  TASK_UPDATED: 'Task updated successfully',
+  TASK_DELETED: 'Task deleted successfully',
 };
 
 export default messages;

@@ -3,7 +3,6 @@
 import jwt from 'jsonwebtoken';
 import { prisma } from '../config/db.js';
 import { JWT_SECRET_KEY } from '../constants/environment.js';
-import { ROLES } from '../constants/index.js';
 import messages from '../constants/messages.js';
 import ExceptionHandler from '../utils/error.js';
 
@@ -15,7 +14,7 @@ const verifyToken = (token) => {
   }
 };
 
-const requireAuth = async (req, res, next) => {
+const authenticateUser = async (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization) {
@@ -42,19 +41,4 @@ const requireAuth = async (req, res, next) => {
   }
 };
 
-const authorizeAdmin = (req, res, next) => {
-  requireAuth(req, res, (err) => {
-    if (err) return next(err);
-
-    if (!req.user || req.user.role !== ROLES.admin) {
-      return next(ExceptionHandler.Forbidden('Access denied. Admins only.'));
-    }
-
-    next();
-  });
-};
-
-export default {
-  authenticateUser: requireAuth,
-  authorizeAdmin,
-};
+export default authenticateUser;
