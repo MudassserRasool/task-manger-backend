@@ -2,7 +2,7 @@ import { JWT_SECRET_KEY } from '../constants/environment.js';
 import ExceptionHandler from '../utils/error.js';
 
 const authenticateAdmin = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
+  const token = req?.headers?.authorization?.split(' ')[1];
 
   if (!token) {
     return res
