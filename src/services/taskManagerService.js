@@ -9,7 +9,13 @@ class TaskManagerService {
   }
 
   async getTasks() {
-    const tasks = await prisma.task.findMany();
+    const tasks = await prisma.task.findMany({
+      select: {
+        id: true,
+        title: true,
+        description: true,
+      },
+    });
     return tasks;
   }
 
@@ -17,6 +23,11 @@ class TaskManagerService {
     const task = await prisma.task.findUnique({
       where: {
         id: Number(id),
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
       },
     });
     return task;
