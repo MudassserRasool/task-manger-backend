@@ -1,4 +1,4 @@
-import authMiddleware from '../middlewares/authMiddleware.js';
+import { requireAuth } from '../middlewares/authMiddleware.js';
 import taskMangerRoute from '../routes/taskMangerRoute.js';
 import userRouter from '../routes/userRoute.js';
 const apiRoutes = [
@@ -11,7 +11,7 @@ const apiRoutes = [
   {
     baseResource: 'task',
     router: taskMangerRoute,
-    middlewares: [authMiddleware],
+    middlewares: [requireAuth],
   },
 ];
 
